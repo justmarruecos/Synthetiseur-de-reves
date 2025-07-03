@@ -50,10 +50,12 @@ def text_analysis(text):
     predictions = json.loads(chat_response.choices[0].message.content)
     return softmax(predictions) 
     
-if __name__ == "__main__":
-    audio_path = "../reve.mp3"
-    print("extraction de texte:")
-    text = speech_to_text(audio_path, language="fr")
-    print(f"text extrait: {text}\n")
-    analysis = text_analysis(text)
-    print(analysis)
+"""    if __name__ == "__main__":
+        audio_path = "../reve.mp3"
+        print("extraction de texte:")
+        text = speech_to_text(audio_path, language="fr")
+        print(f"text extrait: {text}\n")
+        analysis = text_analysis(text)
+        print(analysis)
+        
+        """
