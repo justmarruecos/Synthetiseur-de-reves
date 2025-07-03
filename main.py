@@ -31,25 +31,22 @@ def speech_to_text(audio_path, language="fr"):
         )
         return transcription.text
     
-def text_analysis(text):
-    client = Mistral(api_key = os.environ["MISTRAL_API_KEY"])
-    chat_response = client.chat.complete(
-        model="mistral-large-latest",
+def text_analysis(text: str) -> dict:
+    client = Groq(api_key=os.environ["GROQ_API_KEY"])
+
+    system_prompt = read_file("context_analysis.txt")
+
+    response = client.chat.completions.create(
+        model="llama3-8b-8192",
         messages=[
-            {
-                "role": "system",
-                "content": read_file(text_file_path="context_analysis.txt"),
-            },
-            {
-                "role": "user",
-                "content": f"Analyse le texte ci-dessous (ta réponse doit etre dans le format JSON): {text}",
-            },
-        ],
-        response_format = {"type": "json_object",}
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": f"Analyse le texte suivant (réponds en JSON) : {text}"}
+        ]
     )
 
-    predictions = json.loads(chat_response.choices[0].message.content)
-    return softmax(predictions) 
+    raw_json = response.choices[0].message.content
+    predictions = json.loads(raw_json)
+    return softmax(predictions)
 
 def generate_image_from_text(prompt: str) -> bytes:
     api_key = os.getenv("CLIPDROP_API_KEY")
