@@ -3,7 +3,6 @@ import json
 import tempfile
 import os
 import matplotlib.pyplot as plt
-import base64
 
 from main import speech_to_text, text_analysis, generate_image_from_text
 
@@ -38,11 +37,15 @@ if mode == "Texte":
 
                 # Image générée à partir du rêve
                 st.markdown("## 🎨 Image générée à partir de ton rêve")
-                with st.spinner("Génération de l’image..."):
-                    image_base64 = generate_image_from_text(text_input)
-                    image_data = base64.b64decode(image_base64)
-                    st.image(image_data, caption="Image du rêve")
 
+                dream_prompt = f"Un rêve surréaliste : {text_input}. Illustration onirique, style artistique doux et lumineux."
+
+                try:
+                    image_data = generate_image_from_text(dream_prompt)
+                    st.image(image_data, caption="Image du rêve", use_container_width=True)
+                except Exception as e:
+                    st.error(f"Erreur lors de la génération de l’image : {e}")
+                    st.text(f"Prompt utilisé : {dream_prompt}")
 
 elif mode == "Audio (.mp3)":
     uploaded_file = st.file_uploader("🎵 Charge un fichier audio (.mp3)", type=["mp3"])
@@ -67,6 +70,17 @@ elif mode == "Audio (.mp3)":
                 ax.set_title("Intensité des émotions")
                 ax.set_ylim(0, 1)
                 st.pyplot(fig)
+
+                # Image générée à partir du rêve
+                st.markdown("## 🎨 Image générée à partir de ton rêve")
+
+                try:
+                    prompt = f"Crée une image à partir de ce rêve : {text_from_audio}"
+                    image_data = generate_image_from_text(prompt)
+                    st.image(image_data, caption="Image du rêve", use_container_width=True)
+                except Exception as e:
+                    st.error(f"Erreur lors de la génération de l’image : {e}")
+                    st.text(f"Prompt utilisé : {text_from_audio}")
 
             finally:
                 os.remove(temp_audio_path)
