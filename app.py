@@ -3,8 +3,10 @@ import json
 import tempfile
 import os
 import matplotlib.pyplot as plt
+import base64
 
-from main import speech_to_text, text_analysis
+from main import speech_to_text, text_analysis, generate_image_from_text
+
 
 st.set_page_config(page_title="Analyseur d'Émotions", layout="centered")
 
@@ -27,12 +29,20 @@ if mode == "Texte":
                 st.success("Analyse terminée !")
                 st.json(result)
 
-                # Graphique
+                # Graphique en barres
                 fig, ax = plt.subplots()
                 ax.bar(result.keys(), result.values())
                 ax.set_title("Intensité des émotions")
                 ax.set_ylim(0, 1)
                 st.pyplot(fig)
+
+                # Image générée à partir du rêve
+                st.markdown("## 🎨 Image générée à partir de ton rêve")
+                with st.spinner("Génération de l’image..."):
+                    image_base64 = generate_image_from_text(text_input)
+                    image_data = base64.b64decode(image_base64)
+                    st.image(image_data, caption="Image du rêve")
+
 
 elif mode == "Audio (.mp3)":
     uploaded_file = st.file_uploader("🎵 Charge un fichier audio (.mp3)", type=["mp3"])

@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 import os
 import json
 import math
+import requests
+import base64
 load_dotenv()
 
 def read_file(text_file_path):
@@ -49,7 +51,30 @@ def text_analysis(text):
 
     predictions = json.loads(chat_response.choices[0].message.content)
     return softmax(predictions) 
-    
+
+def generate_image_from_text(prompt: str, width: int = 512, height: int = 512, seed: int = 123) -> str:
+    api_key = os.getenv("CLIPDROP_API_KEY")
+    url = "https://clipdrop-api.co/text-to-image/v1"
+
+    headers = {
+        "x-api-key": api_key,
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "prompt": prompt,
+        "width": width,
+        "height": height,
+        "seed": seed
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
+
+    if response.status_code == 200:
+        return response.json()["image"]
+    else:
+        raise Exception(f"Erreur API ClipDrop : {response.status_code}, {response.text}")
+
 """    if __name__ == "__main__":
         audio_path = "../reve.mp3"
         print("extraction de texte:")
